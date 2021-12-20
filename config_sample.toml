@@ -1,0 +1,45 @@
+# 패리티 작동에 관한 기본 매개변수
+[parity]
+chain = "/openethereum/genesis.json"
+base_path = "/openethereum/"
+
+# 네트워크 및 피어 관련 설정
+# 패리티가 오프라인 모드인 경우 네트워크 사용 불가
+[network]
+port = 30305
+reserved_peers= "/openethereum/nodes"
+
+# HTTP를 통해 JSON-RPC API를 노출
+[rpc]
+# HTTP를 통한 JSON-RPC는 포트 8547에서 액세스할 수 있습니다.
+port = 8547
+apis = ["web3", "eth", "net", "personal", "parity", "parity_set", "traces" ,"rpc", "parity_accounts"]
+# JSON-RPC는 모든 로컬에서 연결을 수신 대기합니다.
+interface = "all"
+# 모든 도메인의 교차 출처 요청을 허용합니다.
+cors = ["all"]
+
+[websockets]
+disable = false
+port = 10546
+interface = "all"
+origins = ["none"]
+apis = ["all"]
+hosts = ["all"]
+
+[account]
+password = ["/openethereum/password"] 
+
+# 마이닝 노드에 대한 옵션
+[mining]
+# 블록 채굴 시 보상을 받을 계정 주소입니다.
+engine_signer = "0xaea5926a76f64375bae726de3d0c943c8f8c3b67"
+# 새 블록을 밀봉할 때 블록당 4000000 가스를 목표로 합니다.
+gas_floor_target = "40000000"
+
+# Miscellaneous, 기타 분류되지 않은 옵션
+[misc]
+# 로깅 패턴(`<module>=<level>`, 예: `own_tx=trace`)
+logging = "own_tx=trace"
+# 로그는 이곳에 저장됩니다.
+log_file = "/openethereum/log.log"

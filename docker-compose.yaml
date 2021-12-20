@@ -1,0 +1,173 @@
+version: "3"
+
+services:
+
+  one:
+    image: "dndfjddl/openethereum:pos1"
+    tty: true
+    ports:
+      - 8547:8547
+      - 30305:30305
+      - 10546:10546
+    environment:
+      ENV: ETHERNODE1
+      RPCPORT: 8547
+      PORT: 30305
+      RUST_BACKTRACE: 1
+    volumes:
+      - ./config1.toml:/openethereum/config.toml
+      - ./genesis1.json:/openethereum/genesis.json
+      - ./password:/openethereum/password
+      - ./nodes:/openethereum/nodes
+      - ./keys1:/openethereum/keys
+    container_name: one
+    command: >
+      sh -c "cd ~/
+            /openethereum/target/release/openethereum --config /openethereum/config.toml"
+    working_dir: /openethereum
+
+
+  act:
+    image: "dndfjddl/openethereum:pos2"
+    tty: true
+    ports:
+      - 8548:8548
+      - 30306:30306
+      - 10547:10547
+    environment:
+      ENV: ETHERNODE1
+      RPCPORT: 8548
+      PORT: 30306
+      RUST_BACKTRACE: 1
+    volumes:
+      - ./config2.toml:/openethereum/config.toml
+      - ./genesis2.json:/openethereum/genesis.json
+      - ./password:/openethereum/password
+      - ./nodes:/openethereum/nodes
+      - ./keys2:/openethereum/keys
+    container_name: act
+    command: >
+      sh -c "cd ~/
+            /openethereum/target/release/openethereum --config /openethereum/config.toml"
+    working_dir: /openethereum
+
+  ggom:
+    image: "dndfjddl/openethereum:pos3"
+    tty: true
+    ports:
+      - 8549:8549
+      - 30307:30307
+      - 10548:10548
+    environment:
+      ENV: ETHERNODE1
+      RPCPORT: 8549
+      PORT: 30307
+      RUST_BACKTRACE: 1
+    volumes:
+      - ./config3.toml:/openethereum/config.toml
+      - ./genesis3.json:/openethereum/genesis.json
+      - ./password:/openethereum/password
+      - ./keys3:/openethereum/keys
+      - ./nodes:/openethereum/nodes
+    container_name: ggom
+    command: >
+      sh -c "cd ~/
+            /openethereum/target/release/openethereum --config /openethereum/config.toml"
+    working_dir: /openethereum
+
+  heini:
+    image: "dndfjddl/openethereum:pos4"
+    tty: true
+    ports:
+      - 8550:8550
+      - 10549:10549
+    environment:
+      ENV: ETHERNODE1
+      RPCPORT: 8550
+      PORT: 30308
+      RUST_BACKTRACE: 1
+    volumes:
+      - ./config4.toml:/openethereum/config.toml
+      - ./genesis4.json:/openethereum/genesis.json
+      - ./password:/openethereum/password
+      - ./nodes:/openethereum/nodes
+      - ./keys4:/openethereum/keys
+    container_name: heini
+    command: >
+      sh -c "cd ~/
+            /openethereum/target/release/openethereum --config /openethereum/config.toml"
+    working_dir: /openethereum
+ 
+    
+    # depends_on:
+    #   - one
+    #   - act
+    #   - ggom
+    #   - heini
+  entry1:
+    image: "nara7875/etcexplorer:5"
+    ports:
+      - 3001:3000
+    links:
+      - one:one
+    volumes:
+      - ./config1.json:/config.json
+      - ./imgONE.png:/public/img/explorer-logo.png
+    environment:
+      MONGO_URI: mongodb://host.docker.internal/explorerDB
+    command : bash -c "/wait-for-it.sh -h mongo -p 27017 -t 30 -- npm run start"
+      
+  entry2:
+    image: "nara7875/etcexplorer:5"
+    ports:
+      - 3002:3000
+    links:
+      - act:act
+    volumes:
+      - ./config2.json:/config.json
+      - ./imgACT.png:/public/img/explorer-logo.png
+    environment:
+      MONGO_URI: mongodb://host.docker.internal/ACT
+    command : bash -c "/wait-for-it.sh -h mongo -p 27017 -t 30 -- npm run start"
+  entry3:
+    image: "nara7875/etcexplorer:5"
+    ports:
+      - 3003:3000
+    links:
+      - ggom:ggom
+    volumes:
+      - ./config3.json:/config.json
+      - ./imgGGOM.png:/public/img/explorer-logo.png
+    environment:
+      MONGO_URI: mongodb://host.docker.internal/GGOM
+    command : bash -c "/wait-for-it.sh -h mongo -p 27017 -t 30 -- npm run start"
+  entry4:
+    image: "nara7875/etcexplorer:5"
+    ports:
+      - 3004:3000
+    links:
+      - heini:heini
+    volumes:
+      - ./config4.json:/config.json
+      - ./imgHEINI.png:/public/img/explorer-logo.png
+    environment:
+      MONGO_URI: mongodb://host.docker.internal/HEINI
+    command : bash -c "/wait-for-it.sh -h mongo -p 27017 -t 30 -- npm run start"
+  db:
+    image: "mongo"
+    ports: 
+      - 27017:27017
+    volumes:
+      - ./db:/data/db
+    depends_on:
+      - one
+      - act
+      - ggom
+      - heini
+    environment:
+      MONGO_INITDB_DATABASE: "[explorerDB, ACT, GGOM, HEINI]"
+
+
+
+
+  
